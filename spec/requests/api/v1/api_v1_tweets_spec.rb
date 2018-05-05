@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'rspec/json_expectations'
 
 RSpec.describe "Api::V1::Tweets", type: :request do
   describe 'GET /api/v1/tweets?user_id=:id&page=:page' do
@@ -95,7 +96,7 @@ RSpec.describe "Api::V1::Tweets", type: :request do
 
   describe 'POST /api/v1/tweets' do
     context 'Unauthenticated' do
-      it_behaves_like :deny_without_authorization, :put, '/api/v1/users/-1'
+      it_behaves_like :deny_without_authorization, :post, '/api/v1/tweets'
     end
 
     context 'Authenticated' do
@@ -155,6 +156,43 @@ RSpec.describe "Api::V1::Tweets", type: :request do
         before { post '/api/v1/tweets/', params: { tweet: tweet_params }, headers: header_with_authentication(user) }
 
         it { expect(response).to have_http_status(:unprocessable_entity) }
+      end
+    end
+  end
+
+  describe 'PUT /api/v1/tweets/:tweet_id' do
+    context 'Unauthenticated' do
+      it_behaves_like :deny_without_authorization, :put, '/api/v1/users/-1'
+    end
+
+    context 'Authenticated' do
+      context 'Resource owner' do
+        let(:user) { create(:user) }
+        let(:tweet) { create(:tweet, user: user) }
+        let(:tweet_params) { attributes_for(:tweet) }
+
+        before { put "/api/v1/tweets/#{tweet.id}", params: { tweet: tweet_params }, headers: header_with_authentication(user) }
+
+        it { expect(response).to have_http_status(:success) }
+
+        it 'returns tweet updated in json' do
+          post '/api/v1/tweets/', params: { tweet: tweet_params }, headers: header_with_authentication(user)
+          expect(json).to include_json(tweet_params)
+        end
+      end
+
+      context 'Not resource owner' do
+        let(:user) { create(:user) }
+        let(:other_user) { create(:user) }
+        let(:tweet) { create(:tweet, user: other_user) }
+        let(:tweet_params) { attributes_for(:tweet) }
+
+
+        before do
+          put "/api/v1/tweets/#{tweet.id}", params: { tweet: tweet_params }, headers: header_with_authentication(user)
+        end
+
+        it { expect(response).to have_http_status(:forbidden) }
       end
     end
   end
