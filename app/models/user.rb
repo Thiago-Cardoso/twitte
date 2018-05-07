@@ -12,4 +12,14 @@ class User < ApplicationRecord
   acts_as_followable
   acts_as_follower
   has_many :tweets, dependent: :destroy
+
+  def timeline
+    #get all tweets and put inside timeline
+    timeline = tweets.map { |tweet| tweet }
+    all_following.each do |user|
+      timeline += user.tweets.map { |tweet| tweet }
+    end
+    #ordenate for created_at
+    timeline.sort_by!(&:created_at).reverse
+  end
 end
