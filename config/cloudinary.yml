@@ -1,0 +1,19 @@
+---
+development:
+  cloud_name: dzut5oail
+  api_key: '685328395712665'
+  api_secret: 1P9iTbW_1MdVsax_9a-KLcdtAis
+  enhance_image_tag: true
+  static_image_support: false
+production:
+  cloud_name: dzut5oail
+  api_key: '685328395712665'
+  api_secret: 1P9iTbW_1MdVsax_9a-KLcdtAis
+  enhance_image_tag: true
+  static_image_support: true
+test:
+  cloud_name: dzut5oail
+  api_key: '685328395712665'
+  api_secret: 1P9iTbW_1MdVsax_9a-KLcdtAis
+  enhance_image_tag: true
+  static_image_support: false
